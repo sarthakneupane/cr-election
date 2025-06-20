@@ -29,6 +29,6 @@ footer b {
 </style>
 
 <footer>
-    Copyright &copy 2025, All rights reserved. <b>Shreya.</b>
+    Copyright &copy 2025, All rights reserved. <b>CR-Election.</b>
 </footer>
 </body>
