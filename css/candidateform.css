@@ -1,0 +1,177 @@
+
+    /* Main Container */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Content Container */
+    .vp-main-container {
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    
+
+    /* Form Container */
+    .vp-form-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+    }
+
+    .vp-form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .vp-form-header h2 {
+        margin: 0;
+    }
+
+    .vp-form-header form {
+        margin: 0;
+    }
+
+
+    /* Form Elements */
+    form {
+        margin-top: 20px;
+    }
+
+    h2 {
+        color: #004080;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin: 15px 0 5px;
+        font-weight: 600;
+        color: #004080;
+    }
+
+    textarea, select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: border 0.3s ease;
+    }
+
+    textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    textarea:focus, select:focus {
+        outline: none;
+        border-color: #004080;
+        box-shadow: 0 0 0 2px rgba(0,64,128,0.2);
+    }
+
+    /* Button Styles */
+    button, .vp-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    button[type="submit"] {
+        background-color: #004080;
+        color: white;
+        width: 100%;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #003366;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,64,128,0.3);
+    }
+
+    .vp-btn-primary {
+        background-color: #004080;
+        color: white;
+    }
+
+    .vp-btn-primary:hover {
+        background-color: #003366;
+    }
+
+    .vp-btn-secondary {
+        background-color: #e0e0e0;
+        color: #333;
+    }
+
+    .vp-btn-secondary:hover {
+        background-color: #d0d0d0;
+    }
+
+    /* Message Styling */
+    p {
+        margin: 15px 0;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    p[style="color: green;"] {
+        background-color: #e8f5e9;
+        color: #2e7d32 !important;
+    }
+
+    p[style="color: red;"] {
+        background-color: #ffebee;
+        color: #c62828 !important;
+        
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .vp-navbar {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .vp-welcome {
+            flex-direction: column;
+        }
+
+        .vp-nav-links {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .vp-form-container {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .vp-main-container {
+            padding: 0 15px;
+        }
+
+        textarea, select {
+            padding: 10px;
+        }
+    }

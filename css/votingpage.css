@@ -1,0 +1,233 @@
+/* Main Container */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Content Container */
+.vp-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* Navbar Styles */
+/* .vp-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+} */
+
+/* .vp-welcome {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.vp-profile-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #004080;
+}
+
+.vp-nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.vp-form-inline {
+    margin: 0;
+} */
+
+/* Voting Content */
+.vp-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+}
+
+.vp-content h2 {
+    color: #004080;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Table Styles */
+.vp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 1rem;
+}
+
+.vp-table thead {
+    background-color: #004080;
+    color: white;
+}
+
+.vp-table th, .vp-table td {
+    padding: 12px;
+    text-align: left;
+}
+
+.vp-table th {
+    font-weight: 600;
+}
+
+.vp-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.vp-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.vp-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Button Styles */
+.vp-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+}
+
+.vp-btn-primary {
+    background-color: #004080;
+    color: white;
+}
+
+.vp-btn-primary:hover {
+    background-color: #003366;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,64,128,0.3);
+}
+
+.vp-btn-secondary {
+    background-color: #e0e0e0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.vp-btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+.vp-vote-btn {
+    background-color: #004080;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.vp-vote-btn:hover {
+    background-color: #003366;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,64,128,0.3);
+}
+
+/* Message Styles */
+.vp-message {
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.vp-message-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #2e7d32;
+}
+
+.vp-message-info {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border-left: 4px solid #1565c0;
+}
+.vp-modal {
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.vp-modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 60%;
+    max-width: 500px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.vp-modal-close {
+    float: right;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .vp-navbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .vp-welcome {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .vp-nav-links {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .vp-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .vp-container {
+        padding: 0 15px;
+    }
+    
+    .vp-content {
+        padding: 20px;
+    }
+    
+    .vp-table th, .vp-table td {
+        padding: 8px;
+    }
+}

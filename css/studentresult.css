@@ -1,0 +1,129 @@
+   /* Main Container */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Content Container */
+.vp-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+
+
+.vp-form-inline {
+    margin: 0;
+}
+
+        .vp-btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .vp-btn-primary {
+            background-color: #004080;
+            color: white;
+        }
+
+        .vp-btn-secondary {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .result-wrapper {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .table-section {
+            flex: 1;
+        }
+
+        .election-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .election-table th, .election-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .election-table th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .election-table img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .election-table .winner {
+            background-color: #d4edda;
+            font-weight: bold;
+        }
+
+        .chart-section {
+            flex: 1;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .winner-announcement {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #dff0d8;
+            border-left: 6px solid #4CAF50;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #3c763d;
+            text-align: center;
+            border-radius: 8px;
+            animation: popUp 1s ease-out;
+        }
+
+        .winner-name {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            font-weight: 900;
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    

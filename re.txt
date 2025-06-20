@@ -1,0 +1,635 @@
+<?php
+include "includes/db.php";
+
+// Get current datetime
+$currentDateTime = date('Y-m-d H:i:s');
+
+// Fetch elections with updated column names and determine status based on current time
+$upcomingElections = [];
+$ongoingElections = [];
+
+$sql = "SELECT e.id, e.election_start_datetime, e.election_end_datetime, c.faculty, c.batch
+        FROM elections e 
+        JOIN classes c ON e.class_id = c.id 
+        ORDER BY e.election_start_datetime ASC";
+$result = $conn->query($sql);
+
+while ($row = $result->fetch_assoc()) {
+    $election = [
+        'id' => $row['id'],
+        'start_datetime' => $row['election_start_datetime'],
+        'end_datetime' => $row['election_end_datetime'],
+        'faculty' => $row['faculty'],
+        'batch' => $row['batch']
+    ];
+    
+    // Determine actual status based on current time
+    if ($currentDateTime < $row['election_start_datetime']) {
+        $upcomingElections[] = $election;
+    } elseif ($currentDateTime >= $row['election_start_datetime'] && $currentDateTime <= $row['election_end_datetime']) {
+        $ongoingElections[] = $election;
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Election Countdowns - Live Status</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 50%, #ffffff 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+            gap: 30px;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .login-sidebar {
+            width: 350px;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 64, 128, 0.1);
+            border: 1px solid rgba(0, 64, 128, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 30px;
+        }
+
+        .countdown-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .page-title h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #004080, #0066cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .login-form {
+            background: linear-gradient(135deg, #004080, #0066cc);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            color: white;
+            text-align: center;
+        }
+
+        .login-form h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .login-form p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .login-btn {
+            background: white;
+            color: #004080;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 64, 128, 0.3);
+        }
+
+        .election-overview {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(0, 64, 128, 0.1);
+        }
+
+        .election-overview h3 {
+            color: #004080;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .overview-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .stat-value {
+            color: #004080;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .countdown-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid transparent;
+            box-shadow: 0 8px 25px rgba(0, 64, 128, 0.08);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #004080, #0066cc);
+        }
+
+        .countdown-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 64, 128, 0.15);
+            border-color: rgba(0, 64, 128, 0.2);
+        }
+
+        .countdown-card.upcoming::before {
+            background: linear-gradient(90deg, #004080, #0066cc);
+        }
+
+        .countdown-card.ongoing::before {
+            background: linear-gradient(90deg, #28a745, #20c997);
+        }
+
+        .election-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #004080;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: linear-gradient(135deg, #f8faff, #e8f2ff);
+            border: 2px solid rgba(0, 64, 128, 0.1);
+            border-radius: 12px;
+            padding: 15px 10px;
+            min-width: 75px;
+            transition: all 0.3s ease;
+        }
+
+        .time-unit:hover {
+            border-color: rgba(0, 64, 128, 0.3);
+            transform: scale(1.05);
+        }
+
+        .time-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            display: block;
+            line-height: 1;
+            font-family: 'Courier New', monospace;
+            color: #004080;
+        }
+
+        .time-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .countdown-status {
+            font-size: 1rem;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: 500;
+            border: 2px solid;
+        }
+
+        .status-upcoming {
+            background: rgba(0, 64, 128, 0.1);
+            color: #004080;
+            border-color: rgba(0, 64, 128, 0.3);
+        }
+
+        .status-ongoing {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border-color: rgba(40, 167, 69, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .no-elections {
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 1s ease-out;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 64, 128, 0.08);
+        }
+
+        .no-elections i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: rgba(0, 64, 128, 0.3);
+        }
+
+        .no-elections h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #004080;
+        }
+
+        .no-elections p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .urgent {
+            animation: urgentPulse 1s infinite alternate;
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(0, 64, 128, 0.05);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        @keyframes urgentPulse {
+            from {
+                border-color: rgba(220, 53, 69, 0.3);
+                background: rgba(220, 53, 69, 0.05);
+            }
+            to {
+                border-color: rgba(220, 53, 69, 0.6);
+                background: rgba(220, 53, 69, 0.1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .login-sidebar {
+                width: 100%;
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 15px;
+                gap: 20px;
+            }
+
+            .page-title h1 {
+                font-size: 2rem;
+            }
+
+            .countdown-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .countdown-card {
+                padding: 20px;
+            }
+
+            .time-number {
+                font-size: 1.8rem;
+            }
+
+            .time-unit {
+                min-width: 65px;
+                padding: 12px 8px;
+            }
+
+            .login-sidebar {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <?php include 'includes/header.php'; ?>
+
+    <div class="floating-elements">
+        <div class="floating-element" style="left: 10%; top: 20%; width: 60px; height: 60px; animation-delay: 0s;"></div>
+        <div class="floating-element" style="left: 80%; top: 10%; width: 40px; height: 40px; animation-delay: 2s;"></div>
+        <div class="floating-element" style="left: 60%; top: 70%; width: 80px; height: 80px; animation-delay: 4s;"></div>
+        <div class="floating-element" style="left: 20%; top: 80%; width: 50px; height: 50px; animation-delay: 6s;"></div>
+    </div>
+
+    <div class="main-container">
+        <!-- Login Sidebar -->
+        <div class="login-sidebar">
+            <div class="login-form">
+                <h2><i class="fas fa-vote-yea"></i> Ready to Vote?</h2>
+                <p>Access your personalized voting dashboard and participate in your class elections.</p>
+                <form action="login.php" method="get">
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Login to Vote
+                    </button>
+                </form>
+            </div>
+
+            <div class="election-overview">
+                <h3><i class="fas fa-chart-pie"></i> Election Overview</h3>
+                <div class="overview-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Upcoming Elections</span>
+                        <span class="stat-value"><?= count($upcomingElections) ?></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Ongoing Elections</span>
+                        <span class="stat-value"><?= count($ongoingElections) ?></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Active</span>
+                        <span class="stat-value"><?= count($upcomingElections) + count($ongoingElections) ?></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Countdown Content -->
+        <div class="countdown-content">
+            <div class="page-title">
+                <h1><i class="fas fa-clock"></i> Live Election Countdowns</h1>
+                <p>Real-time countdown to election events</p>
+            </div>
+
+            <?php if (count($upcomingElections) > 0 || count($ongoingElections) > 0): ?>
+                <div class="countdown-grid">
+                    <?php foreach ($upcomingElections as $election): ?>
+                        <div class="countdown-card upcoming">
+                            <div class="election-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                <?= htmlspecialchars($election['faculty']) ?> <?= htmlspecialchars($election['batch']) ?>
+                            </div>
+                            
+                            <div class="countdown-display" data-target="<?= $election['start_datetime'] ?>" data-type="start">
+                                <div class="time-unit">
+                                    <span class="time-number days">00</span>
+                                    <span class="time-label">Days</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span class="time-number hours">00</span>
+                                    <span class="time-label">Hours</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span class="time-number minutes">00</span>
+                                    <span class="time-label">Minutes</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span class="time-number seconds">00</span>
+                                    <span class="time-label">Seconds</span>
+                                </div>
+                            </div>
+                            
+                            <div class="countdown-status status-upcoming">
+                                <i class="fas fa-hourglass-start"></i> Election Starts Soon
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+
+                    <?php foreach ($ongoingElections as $election): ?>
+                        <div class="countdown-card ongoing">
+                            <div class="election-title">
+                                <i class="fas fa-vote-yea"></i>
+                                <?= htmlspecialchars($election['faculty']) ?> <?= htmlspecialchars($election['batch']) ?>
+                            </div>
+                            
+                            <div class="countdown-display" data-target="<?= $election['end_datetime'] ?>" data-type="end">
+                                <div class="time-unit">
+                                    <span class="time-number days">00</span>
+                                    <span class="time-label">Days</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span class="time-number hours">00</span>
+                                    <span class="time-label">Hours</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span class="time-number minutes">00</span>
+                                    <span class="time-label">Minutes</span>
+                                </div>
+                                <div class="time-unit">
+                                    <span class="time-number seconds">00</span>
+                                    <span class="time-label">Seconds</span>
+                                </div>
+                            </div>
+                            
+                            <div class="countdown-status status-ongoing">
+                                <i class="fas fa-circle"></i> Voting in Progress
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="no-elections">
+                    <i class="fas fa-calendar-times"></i>
+                    <h2>No Active Elections</h2>
+                    <p>There are currently no upcoming or ongoing elections to display.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php include 'includes/footer.php'; ?>
+
+    <script>
+        function updateCountdowns() {
+            const countdownDisplays = document.querySelectorAll('.countdown-display[data-target]');
+            
+            countdownDisplays.forEach(display => {
+                const targetDate = new Date(display.getAttribute('data-target')).getTime();
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance > 0) {
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    display.querySelector('.days').textContent = String(days).padStart(2, '0');
+                    display.querySelector('.hours').textContent = String(hours).padStart(2, '0');
+                    display.querySelector('.minutes').textContent = String(minutes).padStart(2, '0');
+                    display.querySelector('.seconds').textContent = String(seconds).padStart(2, '0');
+
+                    // Add urgent styling if less than 1 hour remaining
+                    const card = display.closest('.countdown-card');
+                    if (distance < 3600000) { // 1 hour
+                        card.classList.add('urgent');
+                    } else {
+                        card.classList.remove('urgent');
+                    }
+                } else {
+                    // Time's up
+                    display.querySelector('.days').textContent = '00';
+                    display.querySelector('.hours').textContent = '00';
+                    display.querySelector('.minutes').textContent = '00';
+                    display.querySelector('.seconds').textContent = '00';
+                    
+                    const card = display.closest('.countdown-card');
+                    card.style.opacity = '0.7';
+                    
+                    const status = card.querySelector('.countdown-status');
+                    if (display.getAttribute('data-type') === 'start') {
+                        status.innerHTML = '<i class="fas fa-play"></i> Election Started!';
+                    } else {
+                        status.innerHTML = '<i class="fas fa-stop"></i> Election Ended!';
+                    }
+                }
+            });
+        }
+
+        // Update countdowns immediately and then every second
+        updateCountdowns();
+        setInterval(updateCountdowns, 1000);
+
+        // Refresh page every 5 minutes to update election data
+        setTimeout(() => {
+            location.reload();
+        }, 300000);
+
+        // Add staggered animation delays to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.countdown-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
+    </script>
+</body>
+</html>
+
+<?php $conn->close(); ?>
